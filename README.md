@@ -34,6 +34,9 @@ A **single-page Streamlit application** that imports a user's CSV into Neon Post
    This creates `optimizer_reader` and `optimizer_uploader` roles, dedicated `optimizer_data` schema, and appends the separate URLs to `.env`. The provisioning command will abort rather than overwrite a pre-existing role. After successful provisioning remove `ADMIN_DATABASE_URL` from `.env` and store owner credentials in a secure password manager.
 
 4. Optional: set `GEMINI_API_KEY` and `GEMINI_MODEL` in `.env` for AI suggestions. Use a text-generation model. The advisor asks for JSON in the text response and validates it locally.
+
+   The app loads `.env` from the project directory and keeps values already exported in the launching shell. Start it with `python -m streamlit run app.py` to use the same interpreter as your Python CLI checks. Restart Streamlit after changing `.env`. The generator and optimization advisor try `GEMINI_MODEL` first. Optionally set `GEMINI_FALLBACK_MODELS` to an ordered, comma-separated list of models available to your key. A fallback is used only after retries for HTTP 500 or 503. HTTP 429 stays on the current model and follows Google's retry guidance within a short wait limit. The dashboard identifies the responding model or shows a sanitized failure stage.
+
 5. Run:
 
    ```bash
@@ -85,7 +88,7 @@ flowchart TD
 - **This is a local/single-user educational prototype.** Physical table names are randomly generated, but session state is not authorization. A shared read-only DB role can access other uploaded tables if their names are learned. Do not deploy to untrusted multiple users without real authentication, per-user privileges, database-enforced isolation, resource controls and a cleanup service.
 - Importing another CSV leaves the existing workspace tables in place. Confirm deletion in an individual table panel to remove it. Closing a session can leave tables behind. Audit and remove stale `optimizer_data.ds_*` tables with a privileged administrator.
 - Runtime measurements vary with cache state, background workload and dataset size; five runs do not guarantee statistical significance. Small CSV datasets may yield almost identical execution plans. SQL equivalence is **not** proven automatically.
-- With consent, Gemini receives the submitted SQL, plan summaries, workspace schemas and sizes, possible join keys, and available index metadata. Sharing up to ten rows from one selected table requires separate opt-in. SQL literals can contain sensitive information. Treat uploaded data as confidential and read your provider's data policies.
+- With consent, the advisor sends submitted SQL, bounded plan summaries, and schemas, sizes, possible join keys, and available index metadata for the relevant tables. Sharing up to ten rows from one selected table requires separate opt-in. SQL literals can contain sensitive information. Treat uploaded data as confidential and read your provider's data policies.
 - Never upload secrets or personal information to a public instance. Keep `.env` outside Git.
 
 ## What it demonstrates

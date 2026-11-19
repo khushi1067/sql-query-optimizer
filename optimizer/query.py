@@ -157,6 +157,10 @@ def validate_sql(query: str, table: TableScope, *, friendly_name: str | None = N
     return _resolve_sql(query, table, friendly_name)[0]
 
 
+def query_table_names(query: str, tables: Mapping[str, str]) -> set[str]:
+    return _resolve_query(query, tables, None)[2]
+
+
 def run_query_preview(query: str, tables: Mapping[str, str]) -> QueryPreview:
     _, resolved = _resolve_sql(query, tables, None)
     with read_connection() as conn:

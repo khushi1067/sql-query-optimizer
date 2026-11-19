@@ -1,8 +1,14 @@
 from __future__ import annotations
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+
+def load_project_environment(path: Path | None = None) -> None:
+    load_dotenv(path or Path(__file__).resolve().parents[1] / ".env", override=False)
+
+
+load_project_environment()
 
 SCHEMA = "optimizer_data"
 MAX_FILE_BYTES = 10 * 1024 * 1024
